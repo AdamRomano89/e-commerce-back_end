@@ -40,6 +40,7 @@ router.get('/:id', async (req, res) => {
     // .catch(err => res.status(500).json(err.message));
 });
 
+// Create a new category
 router.post('/', async (req, res) => {
   // create a new category
   try {
@@ -65,8 +66,8 @@ router.put('/:id', async (req, res) => {
     }, {
       where: {id: req.params.id}
     });
-    // scnario 1 --> no body
-    // scnario 2 --> id not in database
+    // senario 1 --> no body
+    // senario 2 --> id not in database
     if(!req.body.category_name || req.body.category_name === "") return res.status(400).json(`Please enter a vaild data!`);
     if(!data[0]) return res.status(404).json(`No data was found!`);
     res.json(data);
@@ -75,6 +76,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Delete categories by id
 router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   // GET (findOne/findAll)  -- Post (create) -- PUT (update) -- DELETE (destroy)
