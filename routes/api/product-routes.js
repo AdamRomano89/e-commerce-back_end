@@ -33,22 +33,43 @@ router.get("/:id", async (req, res) => {
 // Create product
 router.post("/", async (req, res) => {
   try {
-    const product = await Product.create({
-      product_name: req.body.product_name,
-      price: req.body.price,
-      stock: req.body.stock,
-      tagIds: req.body.tagIds,
+    // const product = await Product.create({
+    //   product_name: req.body.product_name,
+    //   price: req.body.price,
+    //   stock: req.body.stock,
+    //   tagIds: req.body.tagIds,
+    //   include: [Category, Tag]
+    // });
+    // if(req.body.tagIds.length) {
+    //   const productTagIdArray = req.body.tagIds.map((tag_id) => {
+    //     return {
+    //       product_id: product.id,
+    //       tag_id,
+    //     };
+    //   });
+    //   const tagId = await ProductTag.bulkCreate(productTagIdArray);
+    // }
+    // res.status(200).json(product);
+
+    // Capture Inputs
+    const {product_name, price, stock, category_id, tagIds} = req.body;
+
+    const newProduct = await Product.create({
+      product_name,
+      price,
+      stock,
+      category_id
     });
-    if(req.body.tagIds.length) {
-      const productTagIdArray = req.body.tagIds.map((tag_id) => {
-        return {
-          product_id: product.id,
-          tag_id,
-        };
-      });
-      const tagId = await ProductTag.bulkCreate(productTagIdArray);
-    }
-    res.status(200).json(product);
+    if(tagIds.length) {
+        const productTagIdArray = tagIds.map((tag_id) => {
+          return {
+            product_id: newProduct.id,
+            tag_id,
+          };
+        });
+        await ProductTag.bulkCreate(productTagIdArray);
+      };
+    res.json(newProduct);
   } catch (e) {
     console.log(e);
     res.status(400).json(e);
@@ -58,30 +79,35 @@ router.post("/", async (req, res) => {
 // Updates product data
 router.put("/:id", async (req, res) => {
   try {
-    await
-    Product.update(req.body, {
-      where: {
-        id: req.params.id,
-      },
-    })
     
-    const productTags = await ProductTag.findAll({ where: { product_id: req.params.id } });
-    const productTagIds = productTags.map(({ tag_id }) => tag_id);
-    const newProductTags = req.body.tagIds.filter((tag_id) => !productTagIds.includes(tag_id)).map((tag_id) => {
-      return {
-        product_id: req.params.id,
-        tag_id,
-      };
-    });
-    const productTagsRemove = productTags.filter(({ tag_id }) => !req.body.tagIds.includes(tag_id)).map(({ id }) => id);
-    const updateProductTags = await Promise.all([
-      ProductTag.destroy({ where: { id: productTagsRemove } }),
-      ProductTag.bulkCreate(newProductTags),
-    ]);
-    const productById = await Product.findOne({ where: { id: req.params.id }, include: [Category, Tag] });
-    res.json({ productById, updateProductTags })
-  } catch (e) {
-    res.status(400).json({ error: e })
+    // The Updated Product 
+    const updatedProduct = await Product.update(req.body, {where: {id: req.params.id}});
+    // Not Found 
+    if(!updatedProduct) return res.status(404).json("Not Found");
+
+    // FeedBack == not updated
+    if(!updatedProduct[0]) return res.status(400).json("Invalid Inputs");
+
+    // The New Prodct
+    const newProduct = await Product.findOne({where: {id: req.params.id}});
+
+    // handle Tags
+    if(req.body.tagIds.length) {
+      await ProductTag.destroy({
+        where: {product_id: req.params.id}
+      })
+      const productTagIdArray = req.body.tagIds.map((tag_id) => {
+        return {
+          product_id: newProduct.id,
+          tag_id,
+        };
+      });
+      await ProductTag.bulkCreate(productTagIdArray);
+    };
+
+    res.json(newProduct);
+  } catch (error) {
+    return res.status(500).json(error.message);
   }
 });
 // DELETE
