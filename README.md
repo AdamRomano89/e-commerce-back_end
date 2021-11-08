@@ -35,7 +35,7 @@ To get started:
 > THEN I am able to successfully create, update, and delete data in my database      
 
 #### Project Visuals :sunglasses:
-<img width="1156" alt="Screenshot" src="images/Screen Shot 2021-11-07 at 2.28.19 PM">
+<img width="1156" alt="Screenshot" src="images/Screen Shot 2021-11-07 at 2.28.19 PM.png">
 
 #### Video [Here]()
 
