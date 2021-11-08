@@ -80,15 +80,30 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   // GET (findOne/findAll)  -- Post (create) -- PUT (update) -- DELETE (destroy)
-  const {id} = req.params;
+  // const {id} = req.params;
+  // try {
+  //   const data = await Category.destroy({
+  //     where: {id}
+  //   });
+  //   if(!data) return res.status(404).json("Category was not found!");
+  //   res.json(data);
+  // } catch (error) {
+  //   res.status(500).json({err: error.message});
+  // }
   try {
+    const {id} = req.params;
+    // Getting sure all the Products related to this category are deleted
+    await Product.destroy({
+      where: {category_id: id}
+    });
+    // then Delete the aimed Category
     const data = await Category.destroy({
       where: {id}
     });
-    if(!data) return res.status(404).json("Category was not found!");
+    if(!data) return res.status(404).json("Was not Found");
     res.json(data);
   } catch (error) {
-    res.status(500).json({err: error.message});
+    res.status(500).json(error.message);
   }
 });
 
