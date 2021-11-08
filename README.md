@@ -37,7 +37,7 @@ To get started:
 #### Project Visuals :sunglasses:
 <img width="1156" alt="Screenshot" src="images/Screen Shot 2021-11-07 at 2.28.19 PM.png">
 
-#### Video [Here]()
+#### Video [Here](https://youtu.be/672HGg3iQMg)
 
 #### Acknowledgement, Documentation & Resources 🤝
 - [Sequelize Documentation](https://sequelize.org/v5/)
